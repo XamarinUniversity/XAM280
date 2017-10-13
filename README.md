@@ -1,6 +1,6 @@
-# XAM311 - Using ListView in Xamarin.Forms 
+# XAM280 - Using ListView in Xamarin.Forms 
 
-This repository contains exercises for the Xamarin University [XAM311 - Using ListView in Xamarin.Forms ](http://university.xamarin.com/classes/#xam311-listview-xamforms) training course.
+This repository contains exercises for the Xamarin University [XAM280 - Using ListView in Xamarin.Forms ](http://university.xamarin.com/classes/#xam280-listview-xamforms) training course.
 
 Xamarin University offers live and self-guided training on app development for Windows, iOS, and Android. Our self-guided courses are free and let you earn credit towards your Xamarin certification. You can upgrade to a full Xamarin University subscription to get unlimited live instructor-led courses from our extensive catalog and take a certification exam. Please visit [Xamarin University](https://university.xamarin.com/) to learn more or [start a trial subscrption](https://www.xamarin.com/university#request-trial).
 
