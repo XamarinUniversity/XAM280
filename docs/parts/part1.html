@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+    <title>Exercise 1: Display a list of items with a ListView (XAM280)</title>
+    <link rel="stylesheet" type="text/css" href="./res/styles/normalize.css">
+    <link rel="stylesheet" type="text/css" href="./res/styles/prettify.css" />
+    <link rel="stylesheet" type="text/css" href="./res/styles/styles.css">
+</head>
+
+<body>
+    <!-- Use the same title as the StartHere -->
+    <header>XAM280 Using ListView in Xamarin.Forms</header>
+
+    <section id="main">
+        <h2>Exercise 1: Display a list of items with a ListView (XAM280)</h2>
+<p>In this exerise, you will add a ListView to an existing application to display a data collection.</p>
+<figure class="figure">
+<img src="./images/listview-tostring.png" alt="Screenshot of the completed exercise." class="exercise portrait bordered" title="Completed exercise" />
+<figcaption class="figure-caption">Completed exercise</figcaption>
+</figure>
+<blockquote class="info-quote">To complete the exercise, you will need <a href="https://www.visualstudio.com/" target="_blank">Visual Studio for Windows or macOS</a> with the <a href="https://visualstudio.microsoft.com/xamarin/" target="_blank">Xamarin development tools</a> installed. You will also need either an emulator/simulator or a device to run the exercise on. Please see the <a href="https://docs.microsoft.com/xamarin/cross-platform/get-started/installation/" target="_blank">setup page</a> if you need help installing the Xamarin development environment.
+</blockquote>
+
+<hr>
+<h2>Open the starter solution</h2>
+<ol>
+<li>Open the starter solution from the <strong>Exercise 1</strong> &gt; <strong>Start</strong> folder in your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a> in either <strong>Visual Studio</strong> on Windows or <strong>Visual Studio for Mac</strong>.</li>
+<li>Build and run the application. The app displays a single flag, allows you to edit the details of the flag, and lets you switch between the flags using toolbar buttons.</li>
+<li>The solution contains several projects. The shared Xamarin.Forms UI is defined in the <strong>FunFlacts</strong> Portable Class Library (PCL), and there are head projects for iOS, Android and Windows. There is also a <strong>FlagData</strong> project that contains the flag information.</li>
+<li>Examine the classes you'll work with:</li>
+</ol>
+<table>
+<thead>
+<tr>
+	<th>File</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><strong>App.cs</strong></td>
+	<td>Contains the <code>Application</code> class for our Xamarin.Forms application which defines the starting page for the application; this is currently the <code>FlagDetailsPage</code>.</td>
+</tr>
+<tr>
+	<td><strong>FlagDetailsPage.xaml(.cs)</strong></td>
+	<td>Defines the UI and logic for our initial page.</td>
+</tr>
+<tr>
+	<td><strong>FunFlactsViewModel.cs</strong></td>
+	<td>This is in the <strong>FlagData</strong> project and contains the flag sample data. It exposes a collection property (<code>Flags</code>) which returns a <code>IList&lt;Flag&gt;</code>. A single instance of this object is registered with the Xamarin.Forms <code>DependencyService</code>.</td>
+</tr>
+<tr>
+	<td><strong>Flag.cs</strong></td>
+	<td>This defines the data for a single flag. It implements <code>INotifyPropertyChanged</code> and provides several details about the flag.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+<h2>Create a XAML content page</h2>
+<p>Replace the current startup page with a new <code>ContentPage</code>.</p>
+<ol>
+<li>Add a new XAML <code>ContentPage</code> to the <strong>FunFlacts</strong> project. Name it <strong>AllFlags</strong>.</li>
+<li>Open the <strong>AllFlags.xaml</strong> file and set the <code>Title</code> property to <strong>&quot;Fun with Flags&quot;</strong>.</li>
+<li>Delete any existing UI from the XAML.</li>
+<li>Open the <strong>App.xaml.cs</strong> file and go to the constructor.</li>
+<li>Create an instance of your <strong>AllFlags</strong> content page.</li>
+<li>Create a new <code>NavigationPage</code> (or reuse the existing code), passing in the <strong>AllFlags</strong> instance.</li>
+<li>Assign the <code>NavigationPage</code> (containing the AllFlags page) to the <code>MainPage</code> property.</li>
+<li>
+<p>Build and run the app. It will display an empty page. You'll add a <code>ListView</code> to the page in the following steps.</p>
+<pre class="prettyprint-collapse"><code>public App()
+{
+    DependencyService.Register&lt;FunFlactsViewModel&gt;();
+
+    InitializeComponent();
+    MainPage = new NavigationPage(new AllFlags());
+}
+</code></pre>
+
+</li>
+</ol>
+
+<hr>
+<h2>Add a ListView to the page</h2>
+<p>The ListView needs to be populated with data. There's a collection of Flag data defined in <code>FunFlactsViewModel</code> that you'll load into the ListView.</p>
+<ol>
+<li>Open <strong>AllFlags.xaml</strong>.</li>
+<li>
+<p>Add a <code>ListView</code> as the root tag in the <code>ContentPage</code>.</p>
+<pre class="prettyprint-collapse"><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+&lt;ContentPage xmlns=&quot;http://xamarin.com/schemas/2014/forms&quot;
+    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2009/xaml&quot;
+    Title=&quot;Fun with Flags&quot;
+    x:Class=&quot;FunFlacts.AllFlags&quot;&gt;
+
+    &lt;ListView&gt;
+    &lt;/ListView&gt;
+
+&lt;/ContentPage&gt;
+</code></pre>
+
+</li>
+<li>
+<p>Load the <code>FunFlactsViewModel.Flags</code> into to the <code>ListView.ItemsSource</code> property. There are several ways to do this, there are examples below:</p>
+<ul>
+<li>Give the <code>ListView</code> a name <strong>flags</strong> in the XAML and set the <code>ItemsSource</code> property in code behind. You can retrieve the <code>FunFlagsViewModel</code> instance using the <code>DependencyService.Get&lt;FunFlactsViewModel&gt;()</code> method.</li>
+</ul>
+<pre class="prettyprint-collapse"><code>flags.ItemsSource = DependencyService.Get&lt;FunFlactsViewModel&gt;().Flags;
+</code></pre>
+
+</li>
+<li>
+<p>Set the <code>BindingContext</code> for the <code>ContentPage</code> to the <code>FunFlactsViewModel</code> instance in code behind then use a <code>{Binding}</code> on the <code>ListView.ItemsSource</code> property to connect it to the <code>Flags</code> property.</p>
+<pre class="prettyprint-collapse"><code>BindingContext = DependencyService.Get&lt;FunFlactsViewModel&gt;();
+</code></pre>
+
+<pre class="prettyprint"><code>&lt;ListView ItemsSource=&quot;{Binding Flags}&quot; /&gt;
+</code></pre>
+
+</li>
+<li>
+Run the application, it should now display a list of items. Notice that it's displaying the type name (<code>FlagData.Flag</code>) for each item. This is because the <code>ListView</code> uses the <code>ToString()</code> method by default.
+<img src="images/listview-start.png" alt="App running on Android" title="ListView displaying Flags on Android" />
+</li>
+<li>
+Open the <strong>Flag.cs</strong> file in the <strong>FlagData</strong> project and <code>override</code> the <code>ToString</code> method. Have the method return the <code>Country</code> property.
+</li>
+<li>
+Run the application to the see the effect.
+<img src="images/listview-tostring.png" alt="Showing Country names on iOS" title="App running on iOS" />
+</li>
+</ol>
+
+<hr>
+<h2>Exercise summary</h2>
+<p>In this exercise, you learned how to display a collection in Xamarin.Forms. This is a fundamental operation that you'll likely use in most applications that you build.</p>
+<p>You can view the completed solution in the <strong>Exercise 1</strong> &gt; <strong>Completed</strong> folder of your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+
+        <div class="align-right">
+            <a href="../StartHere.html">Go Back</a>
+        </div>
+
+    </section>
+
+    <script src="./res/js/jquery.min.js"></script>
+    <script src="./res/js/jquery.imagemapster.min.js"></script>
+    <script src="./res/js/imagemap.js"></script>
+    <script src="./res/js/prettify.js"></script>
+    <script src="./res/js/script.js"></script>
+
+    <footer>Copyright (C) 2018 Xamarin Inc., Microsoft. All rights reserved.<br><a target="_blank" href="http://university.xamarin.com">Visit Xamarin University for more classes and content</a></footer>
+
+</body>
+</html>

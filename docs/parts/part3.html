@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+    <title>Exercise 3: Work with mutable lists (XAM280)</title>
+    <link rel="stylesheet" type="text/css" href="./res/styles/normalize.css">
+    <link rel="stylesheet" type="text/css" href="./res/styles/prettify.css" />
+    <link rel="stylesheet" type="text/css" href="./res/styles/styles.css">
+</head>
+
+<body>
+    <!-- Use the same title as the StartHere -->
+    <header>XAM280 Using ListView in Xamarin.Forms</header>
+
+    <section id="main">
+        <h2>Exercise 3: Work with mutable lists (XAM280)</h2>
+<p>This exercise will continue building the Fun Flags application. You'll add a new Toolbar to the main page of the application and use it to delete flags from the ListView.</p>
+<blockquote class="info-quote">To complete the exercise, you will need <a href="https://www.visualstudio.com/" target="_blank">Visual Studio for Windows or macOS</a> with the <a href="https://visualstudio.microsoft.com/xamarin/" target="_blank">Xamarin development tools</a> installed. You will also need either an emulator/simulator or a device to run the exercise on. Please see the <a href="https://docs.microsoft.com/xamarin/cross-platform/get-started/installation/" target="_blank">setup page</a> if you need help installing the Xamarin development environment.
+</blockquote>
+
+<hr>
+<h2>Open the starter solution</h2>
+<p>This exercise is a continuation of the previous exercise. You can use your existing solution or begin from the prior <strong>Exercise 2</strong> &gt; <strong>Completed</strong> solution in your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+<hr>
+<h2>Add the ToolBarItem elements to the page</h2>
+<p>Start by adding your <code>ToolBarItem</code> to the page to set your app in &quot;Edit&quot; mode. You'll track the current state and adjust the button text between &quot;Edit&quot; and &quot;Cancel&quot; and two icons indicating edit and cancel.</p>
+<ol>
+<li>Open <code>AllFlags.xaml</code>.</li>
+<li>
+Add a new <code>ToolbarItem</code> to the <code>ToolbarItems</code> collection for the page:
+<ul>
+<li>Give it a meaningful name such as &quot;editButton&quot; so you can access it in code behind</li>
+<li>Set the <code>Text</code> to &quot;Edit&quot;</li>
+<li>Set the <code>Icon</code> to &quot;ic_edit.png&quot;. This is a pre-supplied image that is already in all the platform-specific projects</li>
+<li>Set the <code>IsDestructive</code> property to &quot;true&quot;</li>
+</ul>
+</li>
+<li>Wire up an event handler to the <code>Clicked</code> event on your new toolbar item. Name it <strong>OnEdit</strong> and create the handler in the code behind file. It's defined as a standard <code>EventHandler</code> method.</li>
+</ol>
+<h3>XML markup</h3>
+<pre class="prettyprint-collapse"><code>&lt;ContentPage.ToolbarItems&gt;&lt;ToolbarItem x:Name=&quot;editButton&quot; Text=&quot;Edit&quot; Clicked=&quot;OnEdit&quot; Icon=&quot;ic_edit.png&quot; IsDestructive=&quot;true&quot; /&gt;
+&lt;/ContentPage.ToolbarItems&gt;
+</code></pre>
+
+<h3>C# code</h3>
+<pre class="prettyprint-collapse"><code>public partial class AllFlags : ContentPage
+{
+    private void OnEdit(object sender, EventArgs e)
+    {
+    }
+}
+</code></pre>
+
+
+<hr>
+<h2>Change the toolbar button based on editing state</h2>
+<p>You want to change the button icon and text when you enter and exit &quot;edit&quot; mode. To to this, you could alter the text and icon properties on your existing button, but then you'll have to have duplicate copies of the text and images. Another approach is to use two separate buttons and swap them in and out based on the current editing state. Unfortunately, there's no way to <em>hide</em> a <code>ToolbarItem</code> today so you can't put both of them into the toolbar collection. Instead, you'll store the cancel button in your page resources and then swap them out in your code behind as you enter and exit edit mode.</p>
+<ol>
+<li>Add a new <code>ResourceDictionary</code> into the page; remember this needs to be assigned to the <code>ContentPage.Resources</code> property.</li>
+<li>
+Add a <code>ToolbarItem</code> object to the resource dictionary:
+<ul>
+<li>Give it a key - &quot;cancelEditButton&quot;</li>
+<li>Set the <code>Text</code> to &quot;Cancel&quot;</li>
+<li>Set the <code>Icon</code> to &quot;ic_cancel.png&quot; - this is another pre-supplied image that is already in your platform head projects</li>
+<li>Set the <code>Clicked</code> event to the same handler (<code>OnEdit</code>)</li>
+</ul>
+</li>
+<li>Switch to the code behind file and create a new boolean field named <strong>isEditing</strong>.</li>
+<li>
+<p>Add a <code>ToolbarItem</code> field named <strong>cancelEditButton</strong> to the class. In the constructor, after the call to <code>InitializeComponent</code>, set it to your button from <code>Resources</code>. You can get the value like this:</p>
+<pre class="prettyprint"><code>cancelEditButton = (ToolbarItem)Resources[nameof(cancelEditButton)];
+</code></pre>
+
+</li>
+<li>
+In the <code>OnEdit</code> handler, set the <strong>isEditing</strong> field based on whether the <strong>sender</strong> argument is the <strong>editButton</strong> or <strong>cancelEditButton</strong>. The field should be <strong>true</strong> if the Edit button was pressed, and <strong>false</strong> if it was the Cancel button.
+</li>
+<li>Remove the <strong>sender</strong> <code>ToolbarItem</code> from the <code>ToolbarItems</code> collection and add the correct button based on the state of the <strong>isEditing</strong> field you just assigned. This should <em>swap</em> the button state.</li>
+<li>Try running the application and clicking on your new button; it should switch between the two buttons.</li>
+</ol>
+<h3>XML markup</h3>
+<pre class="prettyprint-collapse"><code>&lt;ContentPage.Resources&gt;
+    &lt;ResourceDictionary&gt;
+        &lt;ToolbarItem x:Key=&quot;cancelEditButton&quot; Text=&quot;Cancel&quot;
+                  Clicked=&quot;OnEdit&quot; Icon=&quot;ic_cancel.png&quot; /&gt;
+    &lt;/ResourceDictionary&gt;
+&lt;/ContentPage.Resources&gt;
+</code></pre>
+
+<h3>C# code</h3>
+<pre class="prettyprint-collapse"><code>public partial class AllFlags : ContentPage
+{
+   bool isEditing;
+   ToolbarItem cancelEditButton;
+
+   public AllFlags()
+   {
+      ...
+      InitializeComponent();
+
+      cancelEditButton = (ToolbarItem)Resources[nameof(cancelEditButton)];
+   }
+  
+   private void OnEdit(object sender, EventArgs e)
+   {
+      var tbItem = sender as ToolbarItem;
+      isEditing = (tbItem == editButton);
+
+      ToolbarItems.Remove(tbItem);
+      ToolbarItems.Add(isEditing ? cancelEditButton : editButton);
+   }
+}
+</code></pre>
+
+
+<hr>
+<h2>Add support for editing mode</h2>
+<p>The editing behaviour starts in &quot;normal&quot; mode (the existing behavior), and when you click the new <strong>Edit</strong> button you'll switch to the &quot;edit&quot; mode.
+In this mode, the ListView will handle the selection by prompting the user to delete the row. If the user affirms the selection, then the row will be removed from the Flags collection.</p>
+<ol>
+<li>
+<p>Start by disabling the current tap behavior (navigate to details) when you are in edit mode. Find the <code>OnItemTapped</code> method and ignore the tap if you are in edit mode (using the <code>isEditing</code> boolean).</p>
+<pre class="prettyprint-collapse"><code>private async void OnItemTapped(object sender, ItemTappedEventArgs e)
+{
+    if (!isEditing)
+    {
+        await this.Navigation.PushAsync(new FlagDetailsPage());
+    }
+}
+</code></pre>
+
+</li>
+<li>
+<p>Next, add an event handler for the <code>ListView.ItemSelected</code> event; you can do this in code behind or XAML.</p>
+<blockquote class="info-quote">You could also add this logic into the existing <code>OnItemTapped</code> method, there would be no difference in this case. You are using the <code>ItemSelected</code> event just to demonstrate its use.
+</blockquote>
+</li>
+<li>
+In the event handler, check the <code>isEditing</code> field; if it's <code>true</code>, prompt the user with <code>DisplayAlert</code> to delete the selected <code>Flag</code>. You will want to display a &quot;Yes&quot; and &quot;No&quot; selection.
+</li>
+<li>If the user responds &quot;Yes&quot;, remove the <code>Flag</code> from the <code>FunFlactsViewModel.Flags</code> collection.</li>
+<li>As a final step, when in edit mode, call the <code>OnEdit</code> method to turn off edit mode after an item is deleted. You will need to pass <strong>cancelEditButton</strong> as the sender.</li>
+<li>
+<p>Run the application and try your change. Does it delete the row? Why or Why not?</p>
+<pre class="prettyprint-collapse"><code>private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
+{
+    if (isEditing)
+    {
+        var flag = (Flag)e.SelectedItem;
+        if (flag != null &amp;amp;&amp;amp; await this.DisplayAlert(&quot;Confirm&quot;,
+                $&quot;Are you sure you want to delete {flag.Country}?&quot;, &quot;Yes&quot;, &quot;No&quot;))
+        {
+            DependencyService.Get&amp;lt;FunFlactsViewModel&gt;()
+                .Flags.Remove(flag);
+        }
+        // Reset the edit button
+        OnEdit(cancelEditButton, EventArgs.Empty);
+    }
+}
+</code></pre>
+
+</li>
+</ol>
+
+<hr>
+<h2>Use an observable collection</h2>
+<p>Examine the assignment of the <code>FlagRepository.Flags</code> collection in the <strong>FlagData</strong> project. Have a look in the constructor. It's currently set to a <code>List&lt;Flag&gt;</code> collection which does not report changes.</p>
+<pre class="prettyprint"><code>Flags = new List&lt;Flag&gt;(flags.OrderBy(f =&gt; f.Country));
+</code></pre>
+
+<blockquote class="info-quote">Notice how the actual property, both here and in our ViewModel, is defined as an <code>IList&lt;T&gt;</code> - this is a good practice to get into because it means you can change the implementation of the underlying list <em>without</em> changing the contract exposed by the class (e.g. the property type).
+</blockquote>
+<ol>
+<li>Instantiate a <code>System.Collections.ObjectModel.ObservableCollection&lt;Flag&gt;</code> instead of the <code>List</code> and then run the app; it should now delete the row and disappear from the UI.</li>
+</ol>
+<h2>Optional Challenge: fix the selection issue</h2>
+<p>Tap on an item to navigate to the details page. Then go back and enter <strong>Edit</strong> mode. Notice that now you cannot tap the currently selected item to delete it! See if you can add the code to fix this minor issue. The completed solution has the fix included. </p>
+<strong>Hint:</strong> there are two ways you can solve this. You can override the <code>OnAppearing</code> to get rid of the selection when you return from the details screen and also de-select the item when you exit edit mode and decide <em>not</em> to delete an item. Alternatively, you can move the logic into the <code>ItemTapped</code> handler which is always called. This is the approach taken by the lab.
+
+<hr>
+<h2>Exercise summary</h2>
+<p>In this exercise, you added support to delete an item from the <code>ListView</code> through a Toolbar button.</p>
+<p>You can view the completed solution in the <strong>Exercise 3</strong> &gt; <strong>Completed</strong> folder of your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+
+        <div class="align-right">
+            <a href="../StartHere.html">Go Back</a>
+        </div>
+
+    </section>
+
+    <script src="./res/js/jquery.min.js"></script>
+    <script src="./res/js/jquery.imagemapster.min.js"></script>
+    <script src="./res/js/imagemap.js"></script>
+    <script src="./res/js/prettify.js"></script>
+    <script src="./res/js/script.js"></script>
+
+    <footer>Copyright (C) 2018 Xamarin Inc., Microsoft. All rights reserved.<br><a target="_blank" href="http://university.xamarin.com">Visit Xamarin University for more classes and content</a></footer>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+    <title>Exercise 4: Add Pull to Refresh support (XAM280)</title>
+    <link rel="stylesheet" type="text/css" href="./res/styles/normalize.css">
+    <link rel="stylesheet" type="text/css" href="./res/styles/prettify.css" />
+    <link rel="stylesheet" type="text/css" href="./res/styles/styles.css">
+</head>
+
+<body>
+    <!-- Use the same title as the StartHere -->
+    <header>XAM280 Using ListView in Xamarin.Forms</header>
+
+    <section id="main">
+        <h2>Exercise 4: Add Pull to Refresh support (XAM280)</h2>
+<p>This exercise will continue modifying your <strong>FunFlacts</strong> application and simulate a pull-to-refresh action with our data. This feature is only supported on iOS and Android currently - you'll need to run it on one of those platforms to try it out.</p>
+<blockquote class="info-quote">To complete the exercise, you will need <a href="https://www.visualstudio.com/" target="_blank">Visual Studio for Windows or macOS</a> with the <a href="https://visualstudio.microsoft.com/xamarin/" target="_blank">Xamarin development tools</a> installed. You will also need either an emulator/simulator or a device to run the exercise on. Please see the <a href="https://docs.microsoft.com/xamarin/cross-platform/get-started/installation/" target="_blank">setup page</a> if you need help installing the Xamarin development environment.
+</blockquote>
+
+<hr>
+<h2>Open the starter solution</h2>
+<p>This exercise is a continuation of the previous exercise. You can use your existing solution or begin from the prior <strong>Exercise 3</strong> &gt; <strong>Completed</strong> solution in your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+<hr>
+<h2>Enable pull-to-refresh support</h2>
+<p>In order to support &quot;pull-to-refresh&quot;, you need to set a property and subscribe to an event on the <code>ListView</code>.</p>
+<ol>
+<li>Open the <strong>AllFlags</strong> page and find the <code>ListView</code> definition.</li>
+<li>Set <code>IsPullToRefreshEnabled</code> to <code>true</code>.</li>
+<li>Add an event handler for the <code>Refreshing</code> event. This has a traditional <code>EventHandler</code> syntax <code>(object sender, EventArgs e)</code>.</li>
+</ol>
+<pre class="prettyprint-collapse"><code>&lt;ListView ItemsSource=&quot;{Binding Flags}&quot;
+    SelectedItem=&quot;{Binding CurrentFlag, Mode=TwoWay}&quot;
+    ItemTapped=&quot;OnItemTapped&quot;
+    IsPullToRefreshEnabled=&quot;True&quot;
+    Refreshing=&quot;OnRefreshing&quot; /&gt;
+</code></pre>
+
+
+<hr>
+<h2>Implement the refresh logic</h2>
+<p>Normally, in the refresh handler, you would initiate a background refresh of your data and, once it's complete, refresh the collection with new data. Since you only have local data to work with, you'll simulate this by reversing the order of our collection data.</p>
+<ol>
+<li>
+<p>In the Refresh handler, reverse the items in the <code>Flag</code> collection. You can get access to it using the following statement:</p>
+<pre class="prettyprint"><code>var collection = DependencyService.Get&amp;lt;FunFlactsViewModel&gt;().Flags;
+</code></pre>
+
+</li>
+<li>
+You can reverse the collection in-place, or use LINQ to create a new collection, clear the old one and replace all the items. Either approach is fine for a small number of items. If you have a lot of changes to make, it can be helpful to use a collection type that supports turning off notification such as the XamU <a href="https://github.com/xamarinhq/xamu-infrastructure/blob/master/src/XamU.Core/Collections/OptimizedObservableCollection.cs" target="_blank">OptimizedObservableCollection</a>. The sample code below will do the reverse in-place by swapping the elements around.
+</li>
+<li>It might be helpful to put a delay into your method so the operation takes a second or two to finish. Use <code>System.Threading.Tasks.Task.Delay</code> with <code>async</code> and <code>await</code> to make sure you don't impact the UI thread. An example is in the below code.</li>
+<li>Set the <code>IsRefreshing</code> property on the <code>ListView</code> to <code>false</code> to indicate you are done refreshing the data. You can case the <strong>sender</strong> parameter to get to the <code>ListView</code>. Do this in a <code>finally</code> clause to make sure it gets executed.</li>
+<li>Run the application on either iOS or Android and &quot;pull&quot; the <code>ListView</code> down to activate the gesture. It should show an activity indicator and then reverse the list.</li>
+</ol>
+<pre class="prettyprint-collapse"><code>private async void OnRefreshing(object sender, EventArgs e)
+{
+    try
+    {
+        var collection = DependencyService.Get&amp;lt;FunFlactsViewModel&gt;().Flags;
+        int i = collection.Count - 1, j = 0;
+        while (i &amp;gt; j)
+        {
+            var temp = collection[i];
+            collection[i] = collection[j];
+            collection[j] = temp;
+            i--; j++;
+            await System.Threading.Tasks.Task.Delay(200); // make it take some time.
+        }
+    }
+    finally
+    {
+        // Turn off the refresh.
+        ((ListView)sender).IsRefreshing = false;
+    }
+}
+</code></pre>
+
+
+<hr>
+<h2>Exercise summary</h2>
+<p>In this exercise, you added support for the pull-to-refresh gesture.</p>
+<p>You can view the completed solution in the <strong>Exercise 4</strong> &gt; <strong>Completed</strong> folder of your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+
+        <div class="align-right">
+            <a href="../StartHere.html">Go Back</a>
+        </div>
+
+    </section>
+
+    <script src="./res/js/jquery.min.js"></script>
+    <script src="./res/js/jquery.imagemapster.min.js"></script>
+    <script src="./res/js/imagemap.js"></script>
+    <script src="./res/js/prettify.js"></script>
+    <script src="./res/js/script.js"></script>
+
+    <footer>Copyright (C) 2018 Xamarin Inc., Microsoft. All rights reserved.<br><a target="_blank" href="http://university.xamarin.com">Visit Xamarin University for more classes and content</a></footer>
+
+</body>
+</html>
