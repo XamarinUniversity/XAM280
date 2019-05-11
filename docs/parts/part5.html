@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+    <title>Exercise 5: Use the built-in ImageCell (XAM280)</title>
+    <link rel="stylesheet" type="text/css" href="./res/styles/normalize.css">
+    <link rel="stylesheet" type="text/css" href="./res/styles/prettify.css" />
+    <link rel="stylesheet" type="text/css" href="./res/styles/styles.css">
+</head>
+
+<body>
+    <!-- Use the same title as the StartHere -->
+    <header>XAM280 Using ListView in Xamarin.Forms</header>
+
+    <section id="main">
+        <h2>Exercise 5: Use the built-in ImageCell (XAM280)</h2>
+<p>This final exercise will provide a better visualization for the rows so that you see the image, country and date adopted.</p>
+<blockquote class="info-quote">To complete the exercise, you will need <a href="https://www.visualstudio.com/" target="_blank">Visual Studio for Windows or macOS</a> with the <a href="https://visualstudio.microsoft.com/xamarin/" target="_blank">Xamarin development tools</a> installed. You will also need either an emulator/simulator or a device to run the exercise on. Please see the <a href="https://docs.microsoft.com/xamarin/cross-platform/get-started/installation/" target="_blank">setup page</a> if you need help installing the Xamarin development environment.
+</blockquote>
+
+<hr>
+<h2>Open the starter solution</h2>
+<p>This exercise is a continuation of the previous exercise. You can use your existing solution or begin from the prior <strong>Exercise 4</strong> &gt; <strong>Completed</strong> solution in your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+<hr>
+<h2>Add a DataTemplate to the ListView</h2>
+<p>The first thing you need to do is assign a <code>DataTemplate</code> definition to the <code>ListView.ItemTemplate</code> property.</p>
+<ol>
+<li>Open the <strong>AllFlags.xaml</strong> markup page.</li></li>
+<li>Assign the <code>ListView.ItemTemplate</code> property to a new <code>DataTemplate</code>.</li></li>
+</ol>
+<pre class="prettyprint-collapse"><code>&lt;ListView ItemsSource=&quot;{Binding Flags}&quot;
+          SelectedItem=&quot;{Binding CurrentFlag, Mode=TwoWay}&quot;
+          ItemTapped=&quot;OnItemTapped&quot;
+          IsPullToRefreshEnabled=&quot;True&quot;
+          Refreshing=&quot;OnRefreshing&quot;&gt;
+    &lt;ListView.ItemTemplate&gt;
+        &lt;DataTemplate&gt;
+
+        &lt;/DataTemplate&gt;
+    &lt;/ListView.ItemTemplate&gt;
+&lt;/ListView&gt;
+</code></pre>
+
+
+<hr>
+<h2>Define an ImageCell for our row visualization</h2>
+<p>Next, you need to supply the visual instructions for the row - these go into the <code>DataTemplate</code> definition. The <code>ListView</code> requires that this always be a <code>Cell</code> type, so you'll use an <code>ImageCell</code> here.</p>
+<ol>
+<li>Inside the <code>DataTemplate</code>, define an <code>ImageCell</code>.</li>
+<li>Set the <code>DetailColor</code> to &quot;Gray&quot;.</li>
+<li>
+Remember that the <code>BindingContext</code> for the row will be a single <code>Flag</code> object definition. Apply <code>{Binding}</code> values for the following properties.
+<ul>
+<li><code>Text</code> &gt; <code>Country</code>.</li>
+<li><code>Detail</code> &gt; <code>DateAdopted</code>, use the <code>StringFormat</code> &quot;'Adopted on {0:d}'&quot;.</li>
+</ul>
+</li>
+</ol>
+<pre class="prettyprint-collapse"><code>&lt;ListView.ItemTemplate&gt;
+    &lt;DataTemplate&gt;
+        &lt;ImageCell DetailColor=&quot;Gray&quot;
+                    Text=&quot;{Binding Country}&quot;
+                    Detail=&quot;{Binding DateAdopted, StringFormat='Adopted on {0:d}'}&quot; /&gt;
+    &lt;/DataTemplate&gt;
+&lt;/ListView.ItemTemplate&gt;  
+</code></pre>
+
+<p>Run the application to see what it looks like now, you should see something like this.</p>
+<figure class="figure">
+<img src="./images/textcell.png" alt="App running on Android" title="Cell with just text running on Android" />
+<figcaption class="figure-caption">Cell with just text running on Android</figcaption>
+</figure>
+<figure class="figure">
+<img src="./images/imagecell.jpg" alt="ImageCell on iOS" title="App with Images running on iOS" />
+<figcaption class="figure-caption">App with Images running on iOS</figcaption>
+</figure>
+<p>Notice how the flags are different sizes on iOS and UWP, but not on Android? In fact on UWP, they are massive images because the native control rendering them goes ahead and uses the full size of the image! You'll look at ways to fix this problem in <strong>XAM312 - Customizing ListView</strong> but for now, you can provide smaller images which are the correct scale/size for displaying in a list. The completed version of this lab adds a new property to the <code>Flag</code> &quot;SmallImageUrl&quot; which has a much smaller image of each flag using a consistent size with a 4px transparent border around it.</p>
+
+<hr>
+<h2>Do the final image binding on the ImageCell</h2>
+<p>The last step is to provide the <code>ImageSource</code> for our <code>ImageCell</code>.</p>
+<ol>
+<li>You need a Value Converter to load the images for our ListView. You already have one setup in the details page. You just need to move it to a more global scope so it's available in your list page. Open the <strong>FlagDetailsPage.xaml</strong> markup page and move the <code>ResourceDictionary</code> into the <code>App.xaml</code> file. You'll need to move the namespace definitions for the converters (xmlns:cvt) and data (xmlns:data).</li>
+<li>Next, open the <strong>AllFlags.xaml</strong> file and data bind the <code>ImageCell.ImageSource</code> property to the <code>ImageUrl</code> property using the converter. Check the syntax in the <code>FlagDetailsPage</code> page where it uses the same converter for the <code>Image</code> if you need some guidance.</li>
+<li>Run the application to see the final results and then comment this code out and try it in code behind.</li>
+</ol>
+<pre class="prettyprint-collapse"><code>&lt;!--Application XAML--&gt;
+
+&lt;Application...&gt;
+    &lt;Application.Resources&gt;
+        &lt;!-- Application resource dictionary --&gt;
+        &lt;ResourceDictionary&gt;
+            &lt;cvt:EmbeddedImageConverter x:Key=&quot;irConverter&quot;
+                ResolvingAssemblyType=&quot;{x:Type data:Flag}&quot; /&gt;
+            &lt;/ResourceDictionary&gt;
+        &lt;/Application.Resources&gt;
+
+&lt;!--Page XAML--&gt;
+
+&lt;ImageCell DetailColor=&quot;Gray&quot;
+    ImageSource=&quot;{Binding ImageUrl, Mode=OneWay, Converter={StaticResource irConverter}}&quot;
+    Text=&quot;{Binding Country}&quot;
+    Detail=&quot;{Binding DateAdopted, StringFormat='Adopted on {0:d}'}&quot; /&gt;
+</code></pre>
+
+<figure class="figure">
+<img src="./images/imagecell.jpg" alt="ImageCell on iOS" title="App with Images running on iOS" />
+<figcaption class="figure-caption">App with Images running on iOS</figcaption>
+</figure>
+<p>Notice how the flags are different sizes on iOS and UWP, but not on Android? In fact on UWP, they are massive images because the native control rendering them goes ahead and uses the full size of the image! You'll look at ways to fix this problem in <strong>XAM312 - Customizing ListView</strong> but for now, you can provide smaller images which are the correct scale/size for displaying in a list. The completed version of this lab adds a new property to the <code>Flag</code> &quot;SmallImageUrl&quot; which has a much smaller image of each flag using a consistent size with a 4px transparent border around it.</p>
+<figure class="figure">
+<img src="./images/fixed-imagecell.jpg" alt="Fixed ImageCell on iOS" title="App with sized images running on iOS" />
+<figcaption class="figure-caption">App with sized images running on iOS</figcaption>
+</figure>
+
+<hr>
+<h2>Exercise summary</h2>
+<p>In this exercise, you provided a new row visualization for the ListView so you can see an image and some details about the contact prior to selecting them.</p>
+<p>You can view the completed solution in the <strong>Exercise 5</strong> &gt; <strong>Completed</strong> folder of your copy of the cloned or downloaded <a href="https://github.com/XamarinUniversity/XAM280/">course materials</a>.</p>
+
+
+        <div class="align-right">
+            <a href="../StartHere.html">Go Back</a>
+        </div>
+
+    </section>
+
+    <script src="./res/js/jquery.min.js"></script>
+    <script src="./res/js/jquery.imagemapster.min.js"></script>
+    <script src="./res/js/imagemap.js"></script>
+    <script src="./res/js/prettify.js"></script>
+    <script src="./res/js/script.js"></script>
+
+    <footer>Copyright (C) 2018 Xamarin Inc., Microsoft. All rights reserved.<br><a target="_blank" href="http://university.xamarin.com">Visit Xamarin University for more classes and content</a></footer>
+
+</body>
+</html>
